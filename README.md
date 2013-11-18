@@ -1,13 +1,13 @@
 CMAT - Column major MATrix
-==========================
+--------------------------
 
 
 Another implementation of a column major matrix package. Similiar to the MATRIX package but with
 more restricted interface. Linear algebra operations available in GOMAS or NETLIB package.
 
 
-FloatMatrix 
------------
+### FloatMatrix 
+
 
   Creating instances
   
@@ -57,8 +57,8 @@ FloatMatrix
     A.Map(mapping)                 Apply mapping to all elements of A
 
 
-Data sources
-------------
+### Data sources
+
 
     interface FloatSource         
        Get(i, j) float64
@@ -68,8 +68,8 @@ Data sources
     NewFloatUniformSource(scale,shift) Create source of uniformly distributed floats
 
 
-Mapping types
--------------
+### Mapping types
+
 
     interface FloatMapping
        Eval(i, j, v) float64
