@@ -52,7 +52,7 @@ func NewCopy(A *FloatMatrix) *FloatMatrix {
 
 // Make a new matrix and use ebuf as element storage. cap(ebuf) must not be less than
 // rows*cols.
-func MakeMatrix(ebuf []float64, rows, cols int) *FloatMatrix {
+func MakeMatrix(rows, cols int, ebuf []float64) *FloatMatrix {
     if int(cap(ebuf)) < rows*cols {
         return nil;
     }

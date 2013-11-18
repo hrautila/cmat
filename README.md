@@ -14,7 +14,7 @@ more restricted interface. Linear algebra operations available in GOMAS or NETLI
     NewMatrix(r, c)                Create a new FloatMatrix of size r rows, c columns
     NewCopy(A)                     Create a new FloatMatrix as copy of A
     NewJoin(join, mlist...)        Create a new compound FloatMatrix from argument matrices
-    MakeMatrix(buf, r, c)          Create a new FloatMatrix, use buf as element store
+    MakeMatrix(r, c, buf)          Create a new FloatMatrix, use buf as element store
 
   Basic attributes
   
