@@ -105,17 +105,32 @@ func (s *FloatUniformSource) Get(i, j int) float64 {
     return s.Scale * (s.Rnd.Float64() + s.Shift)
 }
 
-// Set matrix elements from source. 
+// Set matrix elements from source. Optional bits define which part of
+// the matrix is accessed. Default is to set all entries. 
+// 
+// Bits
+//   UPPER        set upper triangular/trapezoidal part
+//   UPPER|UNIT   set strictly upper triangular/trapezoidal part 
+//   LOWER        set lower triangular/trapezoidal part
+//   LOWER|UNIT   set strictly lower triangular/trapezoidal part 
+//   SYMM         set lower part symmetrically to upper part
+//
+// To set strictly lower part of a matrix: A.SetFrom(src, LOWER|UNIT)
+//
 func (m *FloatMatrix) SetFrom(source FloatSource, bits ...FlagBits) {
     var flags FlagBits = NONE
     if len(bits) > 0 {
         flags = bits[0]
     }
+    unit := 0
+    if flags & UNIT != 0 {
+        unit = 1
+    }
     switch {
     case flags & UPPER != 0:
         // upper triangular/trapezoidial, by rows
         for i := 0; i < m.rows; i++ {
-            for j := i; j < m.cols; j++ {
+            for j := i+unit; j < m.cols; j++ {
                 m.elems[i+j*m.step] = source.Get(i, j)
             }
         }
@@ -123,7 +138,7 @@ func (m *FloatMatrix) SetFrom(source FloatSource, bits ...FlagBits) {
     case flags & LOWER != 0:
         // lower triangular/trapezoidial, by columns
         for j := 0; j < m.cols; j++ {
-            for i := j; i < m.rows; i++ {
+            for i := j+unit; i < m.rows; i++ {
                 m.elems[i+j*m.step] = source.Get(i, j)
             }
         }
