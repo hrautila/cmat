@@ -190,7 +190,7 @@ func (C *FloatMatrix) Column(A *FloatMatrix, col int, sizes ...int) *FloatMatrix
 
 // Return matrix diagonal as row vector.
 func (D *FloatMatrix) Diag(A *FloatMatrix) *FloatMatrix {
-    return D.SubMatrix(A, 0, 0, A.rows, A.cols, A.step+1)
+    return D.SubMatrix(A, 0, 0, 1, A.cols, A.step+1)
 }
 
 
