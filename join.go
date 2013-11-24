@@ -13,6 +13,11 @@ const (
     AUGMENT
 )
 
+// Create a new matrix by joining argument matrices. If join type is AUGMENT
+// then matrices are joined on increasing column numbers ie. horizontally.
+// Result matrix size is rowmax(mlist) by sum(m in mlist; cols(m))
+// If join type is STACK then matrices are joined on increasing row numbers ie.
+// vertically and result matrix size is sum(m in mlist: rows(m) by colmax(mlist).
 func NewJoin(how JoinType, mlist... *FloatMatrix) *FloatMatrix {
     var nrows, ncols, maxrow, maxcol int
     maxrow = 0
