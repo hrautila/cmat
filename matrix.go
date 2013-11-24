@@ -14,9 +14,9 @@ import (
 
 func indexMin(a, b int) int {
     if a < b {
-        return a;
+        return a
     }
-    return b;
+    return b
 }
 
 // Column majoe double precision matrix.
@@ -59,6 +59,22 @@ func MakeMatrix(rows, cols int, ebuf []float64) *FloatMatrix {
     return &FloatMatrix{ebuf, rows, rows, cols}
 }
 
+// Set matrix size and storage. Minimum size for ebuf is stride*cols.
+// If stride zero or negative then rows is used as row stride.
+// Returns nil if buffer capasity too small. Otherwise returns A. 
+func (A *FloatMatrix) SetBuf(rows, cols, stride int, ebuf []float64) *FloatMatrix {
+    if stride <= 0 {
+        stride = rows
+    }
+    if int(cap(ebuf)) < stride*cols {
+        return nil;
+    }
+    A.elems = ebuf
+    A.rows = rows
+    A.cols = cols
+    A.step = stride
+    return A
+}
 
 // Get size of the matrix as tuple (rows, cols).
 func (A *FloatMatrix) Size() (int, int) {
@@ -195,7 +211,7 @@ func (D *FloatMatrix) Diag(A *FloatMatrix) *FloatMatrix {
 
 
 
-// Get element at [i, j]
+// Get element at [i, j]. Returns NaN if indexes are invalid.
 func (A *FloatMatrix) Get(i, j int) float64 {
     if A.rows == 0 || A.cols == 0 {
         return 0.0
@@ -212,7 +228,7 @@ func (A *FloatMatrix) Get(i, j int) float64 {
     return A.elems[i+j*A.step]
 }
 
-// Get element at index i. 
+// Get element at index i. Returns NaN if index is invalid.
 func (A *FloatMatrix) GetAt(i int) float64 {
     if i < 0 {
         i += A.rows*A.cols
@@ -242,7 +258,7 @@ func (A *FloatMatrix) Set(i, j int, v float64) {
     A.elems[i+j*A.step] = v
 }
 
-// Get element at index i. 
+// Set element at index i. 
 func (A *FloatMatrix) SetAt(i int, v float64) {
     if i < 0 {
         i += A.rows*A.cols
@@ -293,7 +309,9 @@ func (A *FloatMatrix) Transpose(B *FloatMatrix) *FloatMatrix {
     return B
 }
 
+// Absolute tolerance. Values v1, v2 are equal within tolerance if ABS(v1-v2) < ABSTOL + RELTOL*ABS(v2)
 const ABSTOL = 1e-8
+// Relative tolerance
 const RELTOL = 1.0000000000000001e-05
 
 func inTolerance(a, b, atol, rtol float64) bool {
@@ -361,7 +379,7 @@ func (A *FloatMatrix) ToString(format string) string {
 }
 
 func (A *FloatMatrix) String() string {
-    return A.ToString("%8.1e")
+    return A.ToString("%9.2e")
 }
 
 // Local Variables:
