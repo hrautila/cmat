@@ -105,6 +105,42 @@ func (s *FloatUniformSource) Get(i, j int) float64 {
     return s.Scale * (s.Rnd.Float64() + s.Shift)
 }
 
+
+// Source for retrieving matrix elements from a table. Default is returned
+// if element index outside table.
+type FloatTableSource struct {
+    Data [][]float64
+    Default  float64
+}
+
+func (ts *FloatTableSource) Get(i, j int) float64 {
+    if i >= len(ts.Data) {
+        return ts.Default
+    }
+    if j >= len(ts.Data[i]) {
+        return ts.Default
+    }
+    return ts.Data[i][j]
+}
+
+// Return source table dimensions.
+func (ts *FloatTableSource) Size() (int, int) {
+    cols := 0
+    rows := len(ts.Data)
+    for i := 0; i < rows; i++ {
+        if cols < len(ts.Data[i]) {
+            cols = len(ts.Data[i])
+        }
+    }
+    return rows, cols
+}
+
+// Create a new table source.
+func NewFloatTableSource(data [][]float64, defval float64) *FloatTableSource {
+    return &FloatTableSource{data, defval}
+}
+
+
 // Set matrix elements from source. Optional bits define which part of
 // the matrix is accessed. Default is to set all entries. 
 // 
