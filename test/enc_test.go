@@ -11,6 +11,7 @@ import (
     "github.com/hrautila/cmat"
     "testing"
     "encoding/gob"
+    "encoding/json"
     "bytes"
 )
 
@@ -73,6 +74,65 @@ func TestSubMatrixGob(t *testing.T) {
     t.Logf("As[%d,%d] == B[%d,%d]: %v\n", ar, ac, br, bc, B.AllClose(&As))
 }
 
+
+
+func TestJSON(t *testing.T) {
+    var B cmat.FloatMatrix
+    var network bytes.Buffer
+    N := 26
+    A := cmat.NewMatrix(N, N)
+    zeromean := cmat.NewFloatNormSource()
+    A.SetFrom(zeromean)
+
+    enc := json.NewEncoder(&network)
+    dec := json.NewDecoder(&network)
+    
+    // encode to network
+    err := enc.Encode(A)
+    //t.Logf("bytes: %v\n", string(network.Bytes()))
+    if err != nil {
+        t.Logf("encode error: %v\n", err)
+        t.FailNow()
+    }
+
+
+    // decode from network
+    err = dec.Decode(&B)
+    if err != nil {
+        t.Logf("decode error: %v\n", err)
+        t.FailNow()
+    }
+    t.Logf("A == B: %v\n", B.AllClose(A))
+}
+
+func TestSubMatrixJSON(t *testing.T) {
+    var B, As cmat.FloatMatrix
+    var network bytes.Buffer
+    N := 26
+    A := cmat.NewMatrix(N, N)
+    zeromean := cmat.NewFloatNormSource()
+    A.SetFrom(zeromean)
+    As.SubMatrix(A, 3, 3, N-6, N-6)
+
+    enc := json.NewEncoder(&network)
+    dec := json.NewDecoder(&network)
+    
+    // encode to network
+    err := enc.Encode(&As)
+    //t.Logf("bytes: %v\n", string(network.Bytes()))
+    if err != nil {
+        t.Logf("encode error: %v\n", err)
+        t.FailNow()
+    }
+
+    // decode from network
+    err = dec.Decode(&B)
+    if err != nil {
+        t.Logf("decode error: %v\n", err)
+        t.FailNow()
+    }
+    t.Logf("As == B: %v\n", B.AllClose(&As))
+}
 
 // Local Variables:
 // tab-width: 4
