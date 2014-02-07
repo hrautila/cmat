@@ -35,7 +35,15 @@ const (
     SYMM
     UNIT
     NONE = 0
+    STRICT = UNIT
 )
+
+func imin(a, b int) int {
+    if a < b {
+        return a
+    }
+    return b
+}
 
 // Make new matrix of size r rows, c cols.
 func NewMatrix(r, s int) *FloatMatrix {
@@ -204,9 +212,20 @@ func (C *FloatMatrix) Column(A *FloatMatrix, col int, sizes ...int) *FloatMatrix
     return C
 }
 
-// Return matrix diagonal as row vector.
-func (D *FloatMatrix) Diag(A *FloatMatrix) *FloatMatrix {
-    return D.SubMatrix(A, 0, 0, 1, A.cols, A.step+1)
+// Return matrix diagonal as row vector. If optional parameter n < 0 returns
+// n'th sub-diagonal. If n > 0 returns n'th super-diagonal and if n == 0 returns
+// main diagonal
+func (D *FloatMatrix) Diag(A *FloatMatrix, n... int) *FloatMatrix {
+    if len(n) == 0 || n[0] == 0 {
+        // main diagonal; 
+        return D.SubMatrix(A, 0, 0, 1, imin(A.rows, A.cols), A.step+1)
+    }
+    if  n[0] > 0 {
+        // super-diagonal
+        return D.SubMatrix(A, 0, n[0], 1, imin(A.rows, A.cols-n[0]), A.step+1)
+    }
+    // subdiagonal
+    return D.SubMatrix(A, -n[0], 0, 1, imin(A.rows+n[0], A.cols), A.step+1)
 }
 
 
