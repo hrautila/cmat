@@ -20,8 +20,8 @@ type FloatMapping interface {
 // part of the matrix is not touched. If flag bit LOWER is set then strictly upper
 // part of the matrix is not touched. If bit SYMM is set then transformer is evaluated
 // only for upper part indexes and strictly lower part is set symmetrically.
-func (A *FloatMatrix) Map(t FloatMapping, bits ...FlagBits) {
-    var flags FlagBits = NONE
+func (A *FloatMatrix) Map(t FloatMapping, bits ...int) {
+    var flags int = NONE
     if len(bits) > 0 {
         flags = bits[0]
     }
@@ -110,7 +110,7 @@ func (A *FloatMatrix) Scale(val float64) {
 }
 
 // Make matrix UPPER triangular matrix ie. set strictly lower part to zero.
-func TriU(A *FloatMatrix, bits FlagBits) *FloatMatrix {
+func TriU(A *FloatMatrix, bits int) *FloatMatrix {
     fnc := func(i, j int, val float64) float64 {
         if i > j {
             return 0.0
@@ -126,7 +126,7 @@ func TriU(A *FloatMatrix, bits FlagBits) *FloatMatrix {
 }
 
 // Make matrix LOWER triangular matrix ie. set strictly upper part to zero.
-func TriL(A *FloatMatrix, bits FlagBits) *FloatMatrix {
+func TriL(A *FloatMatrix, bits int) *FloatMatrix {
     fnc := func(i, j int, val float64) float64 {
         if j > i {
             return 0.0

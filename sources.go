@@ -153,8 +153,8 @@ func NewFloatTableSource(data [][]float64, defval float64) *FloatTableSource {
 //
 // To set strictly lower part of a matrix: A.SetFrom(src, LOWER|UNIT)
 //
-func (m *FloatMatrix) SetFrom(source FloatSource, bits ...FlagBits) {
-    var flags FlagBits = NONE
+func (m *FloatMatrix) SetFrom(source FloatSource, bits ...int) {
+    var flags int = NONE
     if len(bits) > 0 {
         flags = bits[0]
     }

@@ -29,12 +29,14 @@ type FloatMatrix struct {
 
 type FlagBits int
 
+// align values with bit values in gomas-package
 const (
-    UPPER = 1 << iota
-    LOWER
-    SYMM
-    UNIT
-    NONE = 0
+    LOWER  = 0x1
+    UPPER  = 0x2
+    SYMM   = 0x4
+    HERM   = 0x8
+    UNIT   = 0x10
+    NONE   = 0
     STRICT = UNIT
 )
 
@@ -255,6 +257,12 @@ func (A *FloatMatrix) GetAt(i int) float64 {
     if i < 0 || i >= A.rows*A.cols {
         return math.NaN()
     }
+    if A.cols == 1 {
+        return A.elems[i]
+    }
+    if A.rows == 1 {
+        return A.elems[i*A.step]
+    }
     c := i / A.rows
     r := i % A.rows
     return A.elems[r+c*A.step]
@@ -285,9 +293,15 @@ func (A *FloatMatrix) SetAt(i int, v float64) {
     if i < 0 || i >= A.rows*A.cols {
         return
     }
-    c := i / A.rows
-    r := i % A.rows
-    A.elems[r+c*A.step] = v;
+    if A.cols == 1 {
+        A.elems[i] = v
+    } else if A.rows == 1 {
+        A.elems[i*A.step] = v
+    } else {
+        c := i / A.rows
+        r := i % A.rows
+        A.elems[r+c*A.step] = v;
+    }
 }
 
 // Make A copy of B.
