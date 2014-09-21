@@ -109,6 +109,14 @@ func (A *FloatMatrix) Scale(val float64) {
     A.Map(&FloatFunction{fnc}, NONE)
 }
 
+// Element-wise adding
+func (A *FloatMatrix) Add(val float64) {
+    fnc := func(a float64) float64 {
+        return a+val
+    }
+    A.Map(&FloatFunction{fnc}, NONE)
+}
+
 // Make matrix UPPER triangular matrix ie. set strictly lower part to zero.
 func TriU(A *FloatMatrix, bits int) *FloatMatrix {
     fnc := func(i, j int, val float64) float64 {

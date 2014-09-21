@@ -145,6 +145,17 @@ func (A *FloatMatrix) SubMatrix(B *FloatMatrix, row, col int, sizes ...int) *Flo
     return A
 }
 
+// Make X subvector of Y, X = Y[offset:offset+nlen]
+func (X *FloatMatrix) SubVector(Y *FloatMatrix, offset, nlen int) *FloatMatrix {
+    if ! Y.IsVector() {
+        return nil
+    }
+    if Y.rows == 1 {
+        return X.SubMatrix(Y, 0, offset, 1, nlen)
+    }
+    return X.SubMatrix(Y, offset, 0, nlen, 1)
+}
+
 // Make R a row vector of A i.e. R = A[row,:]
 func (R *FloatMatrix) Row(A *FloatMatrix, row int, sizes ...int) *FloatMatrix {
     if row >= A.rows {
@@ -232,7 +243,8 @@ func (D *FloatMatrix) Diag(A *FloatMatrix, n... int) *FloatMatrix {
 
 
 
-// Get element at [i, j]. Returns NaN if indexes are invalid.
+// Get element at [i, j]. Returns NaN if indexes are invalid. Negative indexes
+// counted from end.
 func (A *FloatMatrix) Get(i, j int) float64 {
     if A.rows == 0 || A.cols == 0 {
         return 0.0
@@ -246,6 +258,11 @@ func (A *FloatMatrix) Get(i, j int) float64 {
     if i < 0 || i >= A.rows || j < 0 || j >= A.cols {
         return math.NaN()
     }
+    return A.elems[i+j*A.step]
+}
+
+// Get element at [i, j]. Unsafe version without checks and negative indexes
+func (A *FloatMatrix) GetUnsafe(i, j int) float64 {
     return A.elems[i+j*A.step]
 }
 
@@ -268,6 +285,13 @@ func (A *FloatMatrix) GetAt(i int) float64 {
     return A.elems[r+c*A.step]
 }
 
+// Get element at index i. Unsafe vesrsion
+func (A *FloatMatrix) GetAtUnsafe(i int) float64 {
+    c := i / A.rows
+    r := i % A.rows
+    return A.elems[r+c*A.step]
+}
+
 // Set element at [i, j]
 func (A *FloatMatrix) Set(i, j int, v float64) {
     if A.rows == 0 || A.cols == 0 {
@@ -282,6 +306,11 @@ func (A *FloatMatrix) Set(i, j int, v float64) {
     if i < 0 || i >= A.rows || j < 0 || j >= A.cols {
         return
     }
+    A.elems[i+j*A.step] = v
+}
+
+// Set element at [i, j]
+func (A *FloatMatrix) SetUnsafe(i, j int, v float64) {
     A.elems[i+j*A.step] = v
 }
 
@@ -302,6 +331,13 @@ func (A *FloatMatrix) SetAt(i int, v float64) {
         r := i % A.rows
         A.elems[r+c*A.step] = v;
     }
+}
+
+// Set element at index i. 
+func (A *FloatMatrix) SetAtUnsafe(i int, v float64) {
+    c := i / A.rows
+    r := i % A.rows
+    A.elems[r+c*A.step] = v;
 }
 
 // Make A copy of B.
@@ -390,7 +426,7 @@ func (A *FloatMatrix) AllClose(B *FloatMatrix, tols ...float64) bool {
 
 
 // Convert matrix to string with spesific element format.
-func (A *FloatMatrix) ToString(format string) string {
+func (A *FloatMatrix) ToStringPartial(format string, rowpart, colpart int) string {
     s := ""
     if A == nil {
         return "<nil>"
@@ -405,14 +441,26 @@ func (A *FloatMatrix) ToString(format string) string {
                 s += ", "
             }
             s += fmt.Sprintf(format, A.elems[i+j*A.step])
+            if colpart > 0 && A.cols > colpart && j == (colpart/2 - 1) {
+                s += ", ..."
+                j = A.cols - (colpart/2+1)
+            }
         }
         s += "]"
+        if rowpart > 0 && A.rows > rowpart && i == (rowpart/2 - 1) {
+            s += "\n ...."
+            i = A.rows - (rowpart/2+1)
+        }
     }
     return s
 }
 
+func (A *FloatMatrix) ToString(format string) string {
+    return A.ToStringPartial(format, 18, 9)
+}
+
 func (A *FloatMatrix) String() string {
-    return A.ToString("%9.2e")
+    return A.ToStringPartial("%9.2e", 18, 9)
 }
 
 // Local Variables:
