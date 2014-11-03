@@ -36,6 +36,22 @@ func (s *FloatConstSource) Get(i, j int) float64 {
 	return s.Const;
 }
 
+// Source that provides constant for diagonal, zero otherwise
+type FloatDiagonalSource struct {
+    Const float64
+}
+
+func (s *FloatDiagonalSource) Get(i, j int) float64 {
+    if i != j {
+        return 0.0
+    }
+	return s.Const;
+}
+
+func NewFloatDiagonalSource(val float64) *FloatDiagonalSource {
+    return &FloatDiagonalSource{val}
+}
+
 // Float value source for normally distributed values with mean `Mean` and
 // standard deviation `StdDev`.
 type FloatNormSource struct {
